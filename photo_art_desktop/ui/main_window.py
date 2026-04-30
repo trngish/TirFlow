@@ -24,6 +24,7 @@ class MainWindow(FluentWindow):
         from ui.pages.preprocess_page import PreprocessPage
         from ui.pages.train_page import TrainPage
         from ui.pages.generate_page import GeneratePage
+        from ui.pages.settings_page import SettingsPage
         from ui.pages.system_page import SystemPage
 
         self.preprocess_page = PreprocessPage()
@@ -32,6 +33,8 @@ class MainWindow(FluentWindow):
         self.train_page.setObjectName("Training")
         self.generate_page = GeneratePage()
         self.generate_page.setObjectName("Generate")
+        self.settings_page = SettingsPage()
+        self.settings_page.setObjectName("Settings")
         self.system_page = SystemPage()
         self.system_page.setObjectName("About")
 
@@ -39,6 +42,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.preprocess_page, FluentIcon.PHOTO, "Preprocess")
         self.addSubInterface(self.train_page, FluentIcon.TRAIN, "Training")
         self.addSubInterface(self.generate_page, FluentIcon.IMAGE_EXPORT, "Generate")
+        self.addSubInterface(self.settings_page, FluentIcon.SETTING, "Settings")
         self.addSubInterface(self.system_page, FluentIcon.INFO, "About")
 
         # Set default page
