@@ -5,6 +5,7 @@ Adapted from photo_art_framework for PySide6 desktop
 import os
 import re
 import subprocess
+import sys
 import locale
 from typing import Tuple, List, Optional
 
@@ -69,6 +70,7 @@ def start_training(
     trigger_word: str,
     train_data_dir: str,
     output_name: str,
+    output_dir: str,
     network_dim: int,
     steps: int,
     resolution_w: int,
@@ -104,7 +106,7 @@ def start_training(
         config.VENV_PYTHON, config.SDXL_TRAIN_SCRIPT,
         "--pretrained_model_name_or_path", base_model,
         "--train_data_dir", train_data_dir,
-        "--output_dir", config.OUTPUT_DIR,
+        "--output_dir", output_dir,
         "--output_name", output_name,
         "--save_model_as", "safetensors",
         "--network_module", "networks.lora",
@@ -152,8 +154,13 @@ def start_training(
         cmd.extend(["--noise_offset", "0.05"])
 
     env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUNBUFFERED"] = "1"
     env["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+    # Force UTF-8 mode for subprocess on Windows
+    if sys.platform == "win32":
+        env["PYTHONLEGACYWINDOWSSTDIO"] = "utf-8"
 
     try:
         training_state["running"] = True
@@ -167,16 +174,24 @@ def start_training(
             log_callback(f"Steps: {steps}")
             log_callback("=" * 50)
 
+        # Hide console window on Windows
+        startupinfo = None
+        if sys.platform == "win32":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+
         training_process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            encoding=locale.getpreferredencoding(False),
+            encoding="utf-8",
             errors="replace",
             env=env,
             cwd=config.SCRIPTS_DIR,
-            bufsize=1
+            bufsize=1,
+            startupinfo=startupinfo
         )
 
         logs = []
@@ -190,7 +205,7 @@ def start_training(
                 logs.append(line)
                 if log_callback:
                     log_callback(line)
-                _parse_training_line(line)
+                current_loss = _parse_training_line(line, current_loss)
                 if progress_callback:
                     progress_callback(training_state["progress"], training_state["step"], current_loss)
 
@@ -207,31 +222,34 @@ def start_training(
         return -1, f"Failed to start: {str(e)}"
 
 
-def _parse_training_line(line: str):
-    """Parse training output line"""
+def _parse_training_line(line: str, current_loss: float) -> float:
+    """Parse training output line, returns current_loss"""
     global training_state, loss_history
 
     if "steps:" in line and "%" in line:
+        # Format: 'steps:   0%|          | 1/500 [00:08<1:11:10,  8.56s/it, avr_loss=0.142]'
         m = re.search(r'(\d+)%', line)
         if m:
             training_state["progress"] = int(m.group(1))
-        sm = re.search(r'steps:\s*(\d+)/(\d+)', line)
+        sm = re.search(r'\|\s*(\d+)/(\d+)\s*\[', line)
         if sm:
             training_state["step"] = int(sm.group(1))
 
-    for pattern in [r'loss[:\s=]*([0-9.]+)', r'"loss"\s*:\s*([0-9.]+)', r'loss\s*([0-9.]+)']:
+    for pattern in [r'avr_loss=([0-9.]+)', r'loss[:\s=]*([0-9.]+)', r'"loss"\s*:\s*([0-9.]+)']:
         loss_m = re.search(pattern, line, re.IGNORECASE)
         if loss_m:
             try:
                 current_loss = float(loss_m.group(1))
                 step = training_state["step"]
-                if step > 0 and step % 10 == 0:
+                if step > 0:
                     loss_history.append((step, current_loss))
                     if len(loss_history) > 500:
                         loss_history.pop(0)
                 break
             except ValueError:
                 pass
+
+    return current_loss
 
 
 def stop_training() -> Tuple[int, str]:

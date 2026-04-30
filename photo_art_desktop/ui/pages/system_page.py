@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt
 from qfluentwidgets import CardWidget, StrongBodyLabel, CaptionLabel, SubtitleLabel
 
 import config
+import i18n
 
 
 class SystemPage(QWidget):
@@ -18,13 +19,20 @@ class SystemPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.title_label = None
+        self.env_title_label = None
+        self.path_title_label = None
+        self.about_title_label = None
+        self.tech_title_label = None
+        self.about_text_label = None
+
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(16)
 
         # Title
-        title = SubtitleLabel("PhotoArt Desktop")
-        title.setStyleSheet("font-size: 24px; font-weight: bold;")
-        main_layout.addWidget(title)
+        self.title_label = SubtitleLabel(i18n.T("photo_art_desktop"))
+        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        main_layout.addWidget(self.title_label)
 
         version_label = CaptionLabel("Version 1.0.0")
         main_layout.addWidget(version_label)
@@ -34,7 +42,8 @@ class SystemPage(QWidget):
         env_card = CardWidget()
         env_layout = QGridLayout(env_card)
 
-        env_layout.addWidget(StrongBodyLabel("Environment Information"), 0, 0, 1, 2)
+        self.env_title_label = StrongBodyLabel(i18n.T("environment"))
+        env_layout.addWidget(self.env_title_label, 0, 0, 1, 2)
 
         row = 1
 
@@ -76,7 +85,8 @@ class SystemPage(QWidget):
         path_card = CardWidget()
         path_layout = QGridLayout(path_card)
 
-        path_layout.addWidget(StrongBodyLabel("Path Configuration"), 0, 0, 1, 2)
+        self.path_title_label = StrongBodyLabel(i18n.T("path_config"))
+        path_layout.addWidget(self.path_title_label, 0, 0, 1, 2)
 
         row = 1
         paths = [
@@ -102,19 +112,29 @@ class SystemPage(QWidget):
         about_card = CardWidget()
         about_layout = QVBoxLayout(about_card)
 
-        about_layout.addWidget(StrongBodyLabel("About"))
-        about_text = CaptionLabel(
-            "PhotoArt Desktop is a standalone desktop application for training LoRA models "
-            "for Stable Diffusion XL. It provides a native Windows experience with "
-            "data preprocessing, training, and image generation capabilities."
-        )
-        about_text.setWordWrap(True)
-        about_layout.addWidget(about_text)
+        self.about_title_label = StrongBodyLabel(i18n.T("about"))
+        about_layout.addWidget(self.about_title_label)
+        self.about_text_label = CaptionLabel(i18n.T("app_desc"))
+        self.about_text_label.setWordWrap(True)
+        about_layout.addWidget(self.about_text_label)
 
-        about_layout.addWidget(StrongBodyLabel("Built with:"))
-        tech_text = CaptionLabel("PySide6 + qfluentwidgets + diffusers + kohya-ss/sd-scripts")
+        self.tech_title_label = StrongBodyLabel(i18n.T("built_with") + ":")
+        about_layout.addWidget(self.tech_title_label)
+        tech_text = CaptionLabel(i18n.T("tech_stack"))
         about_layout.addWidget(tech_text)
 
         main_layout.addWidget(about_card)
 
         main_layout.addStretch()
+
+        # Connect language change signal
+        i18n.get_language_manager().language_changed.connect(self.retranslate)
+
+    def retranslate(self):
+        """Retranslate all UI text"""
+        self.title_label.setText(i18n.T("photo_art_desktop"))
+        self.env_title_label.setText(i18n.T("environment"))
+        self.path_title_label.setText(i18n.T("path_config"))
+        self.about_title_label.setText(i18n.T("about"))
+        self.about_text_label.setText(i18n.T("app_desc"))
+        self.tech_title_label.setText(i18n.T("built_with") + ":")

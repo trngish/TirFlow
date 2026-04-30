@@ -2,9 +2,13 @@
 photo_art_framework/generated/
 photo_art_framework/logs/
 photo_art_framework/output/
+photo_art_desktop/generated/
+photo_art_desktop/output/
+photo_art_desktop/build/
+photo_art_desktop/dist/
 train_data/
 train_*/
-
+*_log.txt
 # VS Code
 .vscode/
 

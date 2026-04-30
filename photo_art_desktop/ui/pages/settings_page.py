@@ -55,26 +55,37 @@ class SettingsPage(QWidget):
         about_card = CardWidget()
         about_layout = QVBoxLayout(about_card)
 
-        about_title = StrongBodyLabel(i18n.T("about"))
-        about_layout.addWidget(about_title)
+        self.about_title_label = StrongBodyLabel(i18n.T("about"))
+        about_layout.addWidget(self.about_title_label)
 
-        app_name = SubtitleLabel(i18n.T("photo_art_desktop"))
-        app_name.setStyleSheet("font-size: 24px; font-weight: bold;")
-        about_layout.addWidget(app_name)
+        self.app_name_label = SubtitleLabel(i18n.T("photo_art_desktop"))
+        self.app_name_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        about_layout.addWidget(self.app_name_label)
 
-        version_label = CaptionLabel(f"{i18n.T('version')} 1.0.0")
-        about_layout.addWidget(version_label)
+        self.version_label = CaptionLabel(f"{i18n.T('version')} 1.0.0")
+        about_layout.addWidget(self.version_label)
 
-        desc_label = CaptionLabel(i18n.T("app_desc"))
-        desc_label.setWordWrap(True)
-        about_layout.addWidget(desc_label)
+        self.desc_label = CaptionLabel(i18n.T("app_desc"))
+        self.desc_label.setWordWrap(True)
+        about_layout.addWidget(self.desc_label)
 
-        tech_label = CaptionLabel(f"{i18n.T('built_with')}: {i18n.T('tech_stack')}")
-        about_layout.addWidget(tech_label)
+        self.tech_label = CaptionLabel(f"{i18n.T('built_with')}: {i18n.T('tech_stack')}")
+        about_layout.addWidget(self.tech_label)
 
         main_layout.addWidget(about_card)
 
         main_layout.addStretch()
+
+        # Connect language change signal
+        i18n.get_language_manager().language_changed.connect(self.retranslate)
+
+    def retranslate(self):
+        """Retranslate all UI text"""
+        self.about_title_label.setText(i18n.T("about"))
+        self.app_name_label.setText(i18n.T("photo_art_desktop"))
+        self.version_label.setText(f"{i18n.T('version')} 1.0.0")
+        self.desc_label.setText(i18n.T("app_desc"))
+        self.tech_label.setText(f"{i18n.T('built_with')}: {i18n.T('tech_stack')}")
 
     def on_language_changed(self, index: int):
         """Handle language change"""

@@ -2,6 +2,7 @@
 Internationalization module - Language strings
 """
 from typing import Dict
+from PySide6.QtCore import QObject, Signal
 
 LANGUAGES = {
     "en": "English",
@@ -12,9 +13,17 @@ LANGUAGES = {
 _current_lang = "en"
 
 
+class LanguageManager(QObject):
+    """Language manager with signal for language changes"""
+    language_changed = Signal()
+
+_language_manager = LanguageManager()
+
+
 def set_language(lang: str):
     global _current_lang
     _current_lang = lang
+    _language_manager.language_changed.emit()
 
 
 def get_language() -> str:
@@ -24,6 +33,10 @@ def get_language() -> str:
 def T(key: str) -> str:
     """Get translated string"""
     return _strings.get(_current_lang, {}).get(key, key)
+
+
+def get_language_manager() -> LanguageManager:
+    return _language_manager
 
 
 # English strings
@@ -56,6 +69,7 @@ en_strings: Dict[str, str] = {
     "resume_model_placeholder": "Select LoRA to resume from (.safetensors)...",
     "preset_info": "Preset Info",
     "trigger": "Trigger Word",
+    "output_name": "Output Name",
     "data_dir": "Data Directory",
     "images_count": "{count} images",
     "resolution": "Resolution",
@@ -153,6 +167,7 @@ zh_strings: Dict[str, str] = {
     "resume_model_placeholder": "选择要续训练的 LoRA (.safetensors)...",
     "preset_info": "预设信息",
     "trigger": "触发词",
+    "output_name": "输出名称",
     "data_dir": "数据目录",
     "images_count": "{count} 张图片",
     "resolution": "分辨率",
