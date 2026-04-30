@@ -1,0 +1,55 @@
+# 高质量细节 LoRA 预设
+# 适用场景：追求最高质量的输出，训练时间较长但效果最佳
+# 推荐训练图片数：30-50张
+# 预计训练时间：约 6-8 小时
+
+[general]
+enable_bucket = true
+mixed_precision = "bf16"
+gradient_checkpointing = true
+xformers = true
+
+[model]
+pretrained_model_name_or_path = "d:\\TirFlow\\models\\sd_xl_base_1.0.safetensors"
+
+[datasets]
+train_data_dir = "d:\\TirFlow\\train_data"
+resolution = "1024,1024"
+batch_size = 1
+cache_latents = true
+enable_bucket = true
+max_token_length = 225
+color_aug = false
+flip_aug = true
+random_crop = false
+
+[network]
+network_module = "networks.lora"
+network_dim = 64
+network_alpha = 32
+network_args = []
+
+[training]
+learning_rate = 3e-5
+text_encoder_lr = 3e-5
+unet_lr = 3e-5
+lr_scheduler = "cosine"
+lr_warmup_steps = 400
+max_train_steps = 8000
+save_model_as = "safetensors"
+gradient_accumulation_steps = 4
+optimizer_type = "AdamW8bit"
+noise_offset = 0.05
+keep_tokens = 1
+
+[saving]
+output_dir = "d:\\TirFlow\\output_lora"
+output_name = "hq_detail_lora"
+save_every_n_steps = 800
+save_precision = "bf16"
+
+[sample]
+sample_every_n_steps = 800
+sample_prompts = "trigger_word, masterpiece, best quality, highly detailed, sharp focus, extremely detailed illustration"
+sample_sampler = "euler_a"
+sample_steps = 30

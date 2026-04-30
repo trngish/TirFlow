@@ -1,0 +1,25 @@
+# 写真肖像预设
+# 适合训练人物肖像、写实风格
+
+[general]
+output_name = "portrait_lora"
+network_dim = 32
+network_alpha = 16
+resolution_w = 512
+resolution_h = 768
+steps = 3000
+learning_rate = "1e-4"
+batch_size = 1
+gradient_accumulation = 4
+mixed_precision = "bf16"
+
+[prompt]
+trigger_word = "portrait_style"
+positive = "masterpiece, best quality, photorealistic, portrait photography, professional lighting, detailed skin texture, natural makeup, elegant pose"
+negative = "ugly, deformed, blurry, low quality, cartoon, anime, illustration, painting, 3d render"
+
+[optimization]
+xformers = true
+gradient_checkpointing = true
+vae_tiling = true
+attention_slicing = "auto"

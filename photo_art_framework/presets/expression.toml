@@ -1,0 +1,55 @@
+# 表情姿态 LoRA 预设
+# 适用场景：训练特定的表情和身体姿态
+# 推荐训练图片数：20-30张
+# 预计训练时间：约 2-3 小时
+
+[general]
+enable_bucket = true
+mixed_precision = "bf16"
+gradient_checkpointing = true
+xformers = true
+
+[model]
+pretrained_model_name_or_path = "d:\\TirFlow\\models\\sd_xl_base_1.0.safetensors"
+
+[datasets]
+train_data_dir = "d:\\TirFlow\\train_data"
+resolution = "1024,1024"
+batch_size = 1
+cache_latents = true
+enable_bucket = true
+max_token_length = 225
+color_aug = false
+flip_aug = true
+random_crop = false
+
+[network]
+network_module = "networks.lora"
+network_dim = 24
+network_alpha = 12
+network_args = []
+
+[training]
+learning_rate = 1e-4
+text_encoder_lr = 5e-5
+unet_lr = 1e-4
+lr_scheduler = "cosine"
+lr_warmup_steps = 150
+max_train_steps = 2000
+save_model_as = "safetensors"
+gradient_accumulation_steps = 4
+optimizer_type = "AdamW8bit"
+noise_offset = 0.05
+keep_tokens = 1
+
+[saving]
+output_dir = "d:\\TirFlow\\output_lora"
+output_name = "expression_lora"
+save_every_n_steps = 200
+save_precision = "bf16"
+
+[sample]
+sample_every_n_steps = 200
+sample_prompts = "trigger_word, 1girl, smiling, happy expression, upper body, beautiful face, masterpiece"
+sample_sampler = "euler_a"
+sample_steps = 25

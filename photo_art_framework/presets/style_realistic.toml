@@ -1,0 +1,55 @@
+# 写实画风 LoRA 预设
+# 适用场景：训练写实风格的绘画特征，包括光影、质感、细节等
+# 推荐训练图片数：25-40张
+# 预计训练时间：约 3-4 小时
+
+[general]
+enable_bucket = true
+mixed_precision = "bf16"
+gradient_checkpointing = true
+xformers = true
+
+[model]
+pretrained_model_name_or_path = "d:\\TirFlow\\models\\sd_xl_base_1.0.safetensors"
+
+[datasets]
+train_data_dir = "d:\\TirFlow\\train_data"
+resolution = "1024,1024"
+batch_size = 1
+cache_latents = true
+enable_bucket = true
+max_token_length = 225
+color_aug = false
+flip_aug = true
+random_crop = false
+
+[network]
+network_module = "networks.lora"
+network_dim = 48
+network_alpha = 24
+network_args = []
+
+[training]
+learning_rate = 5e-5
+text_encoder_lr = 5e-5
+unet_lr = 5e-5
+lr_scheduler = "cosine"
+lr_warmup_steps = 250
+max_train_steps = 4500
+save_model_as = "safetensors"
+gradient_accumulation_steps = 4
+optimizer_type = "AdamW8bit"
+noise_offset = 0.05
+keep_tokens = 1
+
+[saving]
+output_dir = "d:\\TirFlow\\output_lora"
+output_name = "realistic_style_lora"
+save_every_n_steps = 450
+save_precision = "bf16"
+
+[sample]
+sample_every_n_steps = 450
+sample_prompts = "trigger_word, photorealistic, realistic, detailed skin, natural lighting, 8k uhd, masterpiece"
+sample_sampler = "euler_a"
+sample_steps = 30

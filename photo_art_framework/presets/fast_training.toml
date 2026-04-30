@@ -1,0 +1,55 @@
+# 快速训练 LoRA 预设
+# 适用场景：快速测试和迭代，在有限时间内获得初步结果
+# 推荐训练图片数：10-15张
+# 预计训练时间：约 30分钟-1小时
+
+[general]
+enable_bucket = true
+mixed_precision = "bf16"
+gradient_checkpointing = true
+xformers = true
+
+[model]
+pretrained_model_name_or_path = "d:\\TirFlow\\models\\sd_xl_base_1.0.safetensors"
+
+[datasets]
+train_data_dir = "d:\\TirFlow\\train_data"
+resolution = "768,768"
+batch_size = 1
+cache_latents = true
+enable_bucket = true
+max_token_length = 225
+color_aug = false
+flip_aug = false
+random_crop = false
+
+[network]
+network_module = "networks.lora"
+network_dim = 16
+network_alpha = 8
+network_args = []
+
+[training]
+learning_rate = 1e-4
+text_encoder_lr = 1e-4
+unet_lr = 1e-4
+lr_scheduler = "cosine"
+lr_warmup_steps = 50
+max_train_steps = 1000
+save_model_as = "safetensors"
+gradient_accumulation_steps = 4
+optimizer_type = "AdamW8bit"
+noise_offset = 0.05
+keep_tokens = 1
+
+[saving]
+output_dir = "d:\\TirFlow\\output_lora"
+output_name = "quick_lora"
+save_every_n_steps = 100
+save_precision = "bf16"
+
+[sample]
+sample_every_n_steps = 100
+sample_prompts = "trigger_word, masterpiece, best quality"
+sample_sampler = "euler_a"
+sample_steps = 20
