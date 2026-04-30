@@ -19,7 +19,6 @@ from ui.main_window import MainWindow
 def main():
     app = QApplication(sys.argv)
     app.setObjectName("PhotoArtDesktop")
-    app.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     # Apply Fluent light theme
     setTheme(Theme.LIGHT)

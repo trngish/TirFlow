@@ -96,7 +96,8 @@ class PreprocessPage(QWidget):
 
         # Output directory
         params_layout.addWidget(StrongBodyLabel("Output Directory:"), 0, 0)
-        self.output_edit = LineEdit(config.TRAIN_DATA_DIR)
+        self.output_edit = LineEdit()
+        self.output_edit.setText(config.TRAIN_DATA_DIR)
         self.browse_output_btn = PushButton("Browse")
         self.browse_output_btn.clicked.connect(self.browse_output)
         params_layout.addWidget(self.output_edit, 0, 1)
@@ -129,7 +130,8 @@ class PreprocessPage(QWidget):
 
         # Trigger word
         params_layout.addWidget(StrongBodyLabel("Trigger Word:"), 4, 0)
-        self.trigger_edit = LineEdit(config.DEFAULT_TRIGGER_WORD)
+        self.trigger_edit = LineEdit()
+        self.trigger_edit.setText(config.DEFAULT_TRIGGER_WORD)
         params_layout.addWidget(self.trigger_edit, 4, 1, 1, 2)
 
         # Workers

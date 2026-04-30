@@ -4,7 +4,7 @@ Main Window with Fluent Design navigation
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt
 
-from qfluentwidgets import NavigationWidget, NavigationItemPosition, FluentWindow
+from qfluentwidgets import NavigationWidget, NavigationItemPosition, FluentWindow, FluentIcon
 from qfluentwidgets import SubtitleLabel, setFont
 
 
@@ -27,15 +27,19 @@ class MainWindow(FluentWindow):
         from ui.pages.system_page import SystemPage
 
         self.preprocess_page = PreprocessPage()
+        self.preprocess_page.setObjectName("Preprocess")
         self.train_page = TrainPage()
+        self.train_page.setObjectName("Training")
         self.generate_page = GeneratePage()
+        self.generate_page.setObjectName("Generate")
         self.system_page = SystemPage()
+        self.system_page.setObjectName("About")
 
-        # Add pages to navigation
-        self.addSubInterface(self.preprocess_page, textual="Preprocess")
-        self.addSubInterface(self.train_page, textual="Training")
-        self.addSubInterface(self.generate_page, textual="Generate")
-        self.addSubInterface(self.system_page, textual="About")
+        # Add pages to navigation (icon, text, position)
+        self.addSubInterface(self.preprocess_page, FluentIcon.PHOTO, "Preprocess")
+        self.addSubInterface(self.train_page, FluentIcon.TRAIN, "Training")
+        self.addSubInterface(self.generate_page, FluentIcon.IMAGE_EXPORT, "Generate")
+        self.addSubInterface(self.system_page, FluentIcon.INFO, "About")
 
         # Set default page
         self.navigationInterface.setCurrentItem("Preprocess")

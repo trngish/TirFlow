@@ -67,7 +67,8 @@ class GeneratePage(QWidget):
         self.model_combo.addItems(base_models)
 
         self.lora_label = StrongBodyLabel("LoRA Path:")
-        self.lora_edit = LineEdit(config.OUTPUT_DIR)
+        self.lora_edit = LineEdit()
+        self.lora_edit.setText(config.OUTPUT_DIR)
         self.browse_lora_btn = PushButton("Browse")
         self.scan_lora_btn = PushButton("Scan")
         self.browse_lora_btn.clicked.connect(self.browse_lora)
@@ -170,7 +171,8 @@ class GeneratePage(QWidget):
         seed_group = CardWidget()
         seed_layout = QGridLayout(seed_group)
         seed_layout.addWidget(StrongBodyLabel("Seed (-1=random):"), 0, 0)
-        self.seed_edit = LineEdit("-1")
+        self.seed_edit = LineEdit()
+        self.seed_edit.setText("-1")
         seed_layout.addWidget(self.seed_edit, 0, 1)
         params_layout.addWidget(seed_group)
 

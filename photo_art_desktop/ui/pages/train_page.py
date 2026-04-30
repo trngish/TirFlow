@@ -102,10 +102,12 @@ class TrainPage(QWidget):
         row3 = QHBoxLayout()
 
         self.trigger_label = StrongBodyLabel("Trigger Word:")
-        self.trigger_edit = LineEdit(config.DEFAULT_TRIGGER_WORD)
+        self.trigger_edit = LineEdit()
+        self.trigger_edit.setText(config.DEFAULT_TRIGGER_WORD)
 
         self.data_label = StrongBodyLabel("Data Dir:")
-        self.data_edit = LineEdit(config.TRAIN_DATA_DIR)
+        self.data_edit = LineEdit()
+        self.data_edit.setText(config.TRAIN_DATA_DIR)
         self.browse_data_btn = PushButton("Browse")
         self.browse_data_btn.clicked.connect(self.browse_data)
 
@@ -186,7 +188,8 @@ class TrainPage(QWidget):
 
         # Learning rate
         params_layout.addWidget(StrongBodyLabel("Learning Rate"), 4, 0)
-        self.lr_edit = LineEdit(config.DEFAULT_LEARNING_RATE)
+        self.lr_edit = LineEdit()
+        self.lr_edit.setText(config.DEFAULT_LEARNING_RATE)
         params_layout.addWidget(self.lr_edit, 4, 1)
 
         main_layout.addWidget(params_group)
