@@ -1,59 +1,104 @@
-# 写真/艺术照训练框架 (PhotoArt Framework)
+# PhotoArt Framework
 
-## 框架概述
+An integrated photo/art portrait LoRA training solution built on [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts).
 
-一体化写真/艺术照训练解决方案：
-- **数据预处理**: 批量图片处理（裁剪+缩放+生成标签）
-- **LoRA训练**: SDXL LoRA模型训练 + Loss曲线监控
-- **图片生成**: 基于LoRA的写真图片生成
+## Features
 
-## 目录结构
+| Module | Description |
+|--------|-------------|
+| **Data Preprocessing** | Batch image processing: center crop, resize, caption generation |
+| **LoRA Training** | SDXL LoRA model training with real-time loss monitoring |
+| **Image Generation** | SDXL + LoRA based portrait generation via Gradio UI |
+
+## Project Structure
 
 ```
 photo_art_framework/
-├── config.py          # 配置与路径
-├── train_engine.py     # 训练引擎
-├── preprocess.py       # 数据预处理
-├── generate.py        # 图片生成
-├── ui.py              # Gradio界面
-├── main.py            # 入口点
-└── 启动框架.bat
+├── config.py           # Configuration and path definitions
+├── train_engine.py      # Training engine (subprocess wrapper)
+├── preprocess.py        # Image preprocessing (crop, resize, caption)
+├── generate.py          # SDXL image generation with LoRA
+├── ui.py               # Gradio web interface
+├── main.py             # Entry point
+├── presets.py          # Training presets
+├── logging_config.py    # Logging setup
+├── presets/            # Training preset definitions (.toml)
+└── output/             # Trained models, logs, sample images
 ```
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 方式1: 使用启动脚本
-双击 启动框架.bat
+# Option 1: Use the launch script
+.\启动框架.bat
 
-# 方式2: 命令行
+# Option 2: Command line
 python main.py
 ```
 
-访问 http://127.0.0.1:7860
+Then open http://127.0.0.1:7860 in your browser.
 
-## 功能Tab
+## Workflow
 
-| Tab | 功能 |
-|-----|------|
-| 🖼️ 数据预处理 | 批量图片处理 |
-| 🚀 训练 | LoRA训练 + Loss曲线 |
-| 🎨 图片生成 | SDXL + LoRA生成 |
-| ℹ️ 系统信息 | 环境配置 |
+1. **Preprocess** → Select raw photos → Auto crop/resize + generate captions
+2. **Train** → Choose base model, set LoRA params → Start training
+3. **Generate** → Select trained LoRA → Generate portraits with custom prompts
 
-## 训练参数
+## Default Training Parameters
 
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| Network Dim | 32 | LoRA维度 |
-| 训练步数 | 3000 | 最大步数 |
-| Batch Size | 1 | 批大小 |
-| 学习率 | 1e-4 | 学习率 |
-| 分辨率 | 512x768 | 竖版写真比例 |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Network Dim | 32 | LoRA rank dimension |
+| Steps | 3000 | Max training steps |
+| Batch Size | 1 | Training batch size |
+| Learning Rate | 1e-4 | AdamW8bit learning rate |
+| Resolution | 512x768 | Portrait aspect ratio (vertical) |
 
-## 系统要求
+## Presets
+
+Located in `presets/` directory:
+
+- `portrait_photo.toml` — Portrait photography
+- `character_fullbody.toml` — Full body character
+- `character_portrait.toml` — Character portrait
+- `style_realistic.toml` — Realistic style
+- `style_anime.toml` — Anime style
+- `high_quality.toml` — High quality (longer training)
+- `fast_training.toml` — Quick training
+- `expression.toml` — Facial expressions
+- `object_clothing.toml` — Clothing items
+- `object_product.toml` — Product photography
+
+## Requirements
 
 - Python 3.10+
 - PyTorch 2.0+
-- CUDA 11.8+
-- 显存: 12GB+ (RTX 3060)
+- CUDA 11.8+ (12GB+ VRAM recommended, RTX 3060)
+- Windows/Linux
+
+## Dependencies
+
+The framework uses `sd-scripts/venv/` for training dependencies:
+- `sd-scripts/venv/Scripts/python.exe` — Training subprocess
+
+Generation uses the system Python with:
+- `diffusers`
+- `transformers`
+- `accelerate`
+- `torch`
+
+## Configuration
+
+Edit `config.py` to customize paths:
+
+```python
+WORKSPACE = r"D:\TirFlow\photo_art_framework"
+MODEL_DIR = r"D:\TirFlow\models"          # Base models
+OUTPUT_DIR = r"...\output"                 # Trained LoRA output
+TRAIN_DATA_DIR = r"D:\TirFlow\train_data_photoart"  # Training images
+SCRIPTS_DIR = r"D:\TirFlow\sd-scripts"     # kohya-ss scripts
+```
+
+## License
+
+This project bundles [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts) which is licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
