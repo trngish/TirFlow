@@ -64,9 +64,10 @@ class TrainPage(QWidget):
         row1 = QHBoxLayout()
 
         self.model_label = StrongBodyLabel("Base Model:")
-        self.model_combo = ComboBox()
-        self.model_combo.addItems(train_engine.get_available_models())
-        self.model_combo.setMinimumWidth(300)
+        self.model_edit = LineEdit()
+        self.model_edit.setPlaceholderText("Select base model (.safetensors, .ckpt, .pth)...")
+        self.browse_model_btn = PushButton("Browse")
+        self.browse_model_btn.clicked.connect(self.browse_model)
 
         self.preset_label = StrongBodyLabel("Preset:")
         self.preset_combo = ComboBox()
@@ -74,7 +75,8 @@ class TrainPage(QWidget):
         self.preset_combo.currentTextChanged.connect(self.on_preset_changed)
 
         row1.addWidget(self.model_label)
-        row1.addWidget(self.model_combo, stretch=1)
+        row1.addWidget(self.model_edit, stretch=1)
+        row1.addWidget(self.browse_model_btn)
         row1.addWidget(self.preset_label)
         row1.addWidget(self.preset_combo, stretch=1)
 
@@ -84,16 +86,16 @@ class TrainPage(QWidget):
         row2 = QHBoxLayout()
 
         self.resume_check = CheckBox("Enable Resume Training")
-        self.resume_combo = ComboBox()
-        self.resume_combo.addItems(train_engine.get_existing_loras())
-        self.refresh_btn = PushButton("Refresh")
-        self.refresh_btn.clicked.connect(self.refresh_loras)
+        self.resume_edit = LineEdit()
+        self.resume_edit.setPlaceholderText("Select LoRA to resume from (.safetensors)...")
+        self.browse_resume_btn = PushButton("Browse")
+        self.browse_resume_btn.clicked.connect(self.browse_resume)
 
         self.preset_info_label = CaptionLabel("")
 
         row2.addWidget(self.resume_check)
-        row2.addWidget(self.resume_combo, stretch=1)
-        row2.addWidget(self.refresh_btn)
+        row2.addWidget(self.resume_edit, stretch=1)
+        row2.addWidget(self.browse_resume_btn)
         row2.addWidget(self.preset_info_label, stretch=1)
 
         main_layout.addLayout(row2)
@@ -267,9 +269,25 @@ class TrainPage(QWidget):
 
         self.trigger_edit.setText(trigger)
 
-    def refresh_loras(self):
-        self.resume_combo.clear()
-        self.resume_combo.addItems(train_engine.get_existing_loras())
+    def browse_model(self):
+        from PySide6.QtWidgets import QFileDialog
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Select Base Model",
+            config.MODEL_DIR,
+            "Model Files (*.safetensors *.ckpt *.pth);;All Files (*)"
+        )
+        if file_path:
+            self.model_edit.setText(file_path)
+
+    def browse_resume(self):
+        from PySide6.QtWidgets import QFileDialog
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Select LoRA to Resume",
+            config.OUTPUT_DIR,
+            "LoRA Files (*.safetensors);;All Files (*)"
+        )
+        if file_path:
+            self.resume_edit.setText(file_path)
 
     def browse_data(self):
         from PySide6.QtWidgets import QFileDialog
@@ -284,12 +302,12 @@ class TrainPage(QWidget):
         self.img_count_label.setText(f"{count} images")
 
     def start_training(self):
-        base_model = self.model_combo.currentText()
+        base_model = self.model_edit.text()
         trigger_word = self.trigger_edit.text()
         data_dir = self.data_edit.text()
 
-        if not base_model or "Please download" in base_model:
-            self.log_viewer.append_log("Error: Please select a base model")
+        if not base_model or not os.path.exists(base_model):
+            self.log_viewer.append_log("Error: Please select a valid base model")
             return
 
         if not data_dir or not os.path.isdir(data_dir):
@@ -304,7 +322,7 @@ class TrainPage(QWidget):
         output_name = f"lora_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         resume_training = self.resume_check.isChecked()
-        resume_lora = self.resume_combo.currentText() if resume_training else ""
+        resume_lora = self.resume_edit.text() if resume_training else ""
 
         self.start_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
