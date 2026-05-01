@@ -96,13 +96,14 @@ class GeneratePage(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(16)
 
-        # === Row 1: Model + LoRA Path ===
+        # === Row 1: Model Path + LoRA Path ===
         row1 = QHBoxLayout()
 
-        self.model_label = StrongBodyLabel(i18n.T("model") + ":")
-        self.model_combo = ComboBox()
-        base_models = train_engine.get_available_models()
-        self.model_combo.addItems(base_models)
+        self.model_label = StrongBodyLabel(i18n.T("base_model") + ":")
+        self.model_edit = LineEdit()
+        self.model_edit.setPlaceholderText(i18n.T("base_model_placeholder"))
+        self.browse_model_btn = PushButton(i18n.T("browse"))
+        self.browse_model_btn.clicked.connect(self.browse_model)
 
         self.lora_label = StrongBodyLabel(i18n.T("lora_path") + ":")
         self.lora_edit = LineEdit()
@@ -113,7 +114,8 @@ class GeneratePage(QWidget):
         self.scan_lora_btn.clicked.connect(self.scan_lora)
 
         row1.addWidget(self.model_label)
-        row1.addWidget(self.model_combo, stretch=2)
+        row1.addWidget(self.model_edit, stretch=2)
+        row1.addWidget(self.browse_model_btn)
         row1.addWidget(self.lora_label)
         row1.addWidget(self.lora_edit, stretch=1)
         row1.addWidget(self.browse_lora_btn)
@@ -275,7 +277,9 @@ class GeneratePage(QWidget):
 
     def retranslate(self):
         """Retranslate all UI text"""
-        self.model_label.setText(i18n.T("model") + ":")
+        self.model_label.setText(i18n.T("base_model") + ":")
+        self.model_edit.setPlaceholderText(i18n.T("base_model_placeholder"))
+        self.browse_model_btn.setText(i18n.T("browse"))
         self.lora_label.setText(i18n.T("lora_path") + ":")
         self.browse_lora_btn.setText(i18n.T("browse"))
         self.scan_lora_btn.setText(i18n.T("scan"))
@@ -303,6 +307,16 @@ class GeneratePage(QWidget):
             self.lora_edit.setText(dir_path)
             self.scan_lora()
 
+    def browse_model(self):
+        from PySide6.QtWidgets import QFileDialog
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, i18n.T("base_model"),
+            config.MODEL_DIR,
+            "Model Files (*.safetensors *.ckpt *.pth);;All Files (*)"
+        )
+        if file_path:
+            self.model_edit.setText(file_path)
+
     def scan_lora(self):
         dir_path = self.lora_edit.text()
         files = generate_module.scan_lora_directory(dir_path)
@@ -313,7 +327,7 @@ class GeneratePage(QWidget):
             self.lora_select_combo.addItem(i18n.T("no_safetensors"))
 
     def generate(self):
-        base_model = self.model_combo.currentText()
+        base_model = self.model_edit.text()
         lora_path = self.lora_select_combo.currentText()
         lora_weight = self.weight_slider.value() / 100.0
         prompt = self.prompt_edit.text()

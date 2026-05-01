@@ -11,6 +11,7 @@ train_*/
 *_log.txt
 # VS Code
 .vscode/
+.idea/
 
 # Workbuddy
 .workbuddy/
